@@ -1,10 +1,8 @@
 import streamlit as st
 import requests
 
-# Page setup
-st.set_page_config(page_title="Ace – Customer Service Rep", page_icon="📞")
+st.set_page_config(page_title="Ace – Customer Service Rep", page_icon="🤖")
 
-# Introduction and role description
 st.markdown("### 👋 Meet Ace – Your Friendly Customer Service Rep for Your Credit Repair Business")
 st.markdown("""
 **Role Title:** Customer Support Specialist  
@@ -48,22 +46,19 @@ st.markdown("""
 
 💬 **Motto:**  
 **Ace is here to keep it smooth, supportive, and stress-free—every step of your credit repair journey!**
-
----
-
 """)
 
-# Input field
-user_question = st.text_input("💬 Ask Ace a question about your credit repair experience:")
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Define the function to query Ollama
+# Display previous messages
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).markdown(msg["content"])
+
+# Function to query Ollama (gemma:2b)
 def query_ollama(prompt):
-    full_prompt = (
-        "You are Ace, a professional and friendly customer service representative for a credit repair business. "
-        "Answer this like you're a real CSR helping someone interested in our services. "
-        "If it's a business or leadership question, kindly refer them to Valor.\n\n"
-        f"Question: {prompt}\n\nAnswer:"
-    )
+    full_prompt = f"You are Ace, a professional and friendly customer service representative for a credit repair business. Answer this like you're a real CSR helping someone interested in our services. If it's a business or leadership question, kindly refer them to Valor.\n\nQuestion: {prompt}\n\nAnswer:"
     
     response = requests.post(
         "http://localhost:11434/api/generate",
@@ -73,21 +68,19 @@ def query_ollama(prompt):
             "stream": False
         }
     )
+    if response.status_code == 200:
+        return response.json()["response"].strip()
+    else:
+        return "Sorry, I'm having trouble reaching Ace right now."
 
-   if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-st.chat_message("assistant").markdown("💬 Hi, I'm Ace! How can I help you today?")
-
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).markdown(msg["content"])
+# Chat input
+user_input = st.chat_input("Type your question here...")
 
 if user_input:
     st.chat_message("user").markdown(user_input)
     with st.spinner("Ace is typing..."):
-        answer = query_ollama(user_input)
-    st.chat_message("assistant").markdown(f"**Ace's Answer:**\n\n{answer}")
+        response = query_ollama(user_input)
+    st.chat_message("assistant").markdown(response)
     st.session_state.messages.append({"role": "user", "content": user_input})
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
