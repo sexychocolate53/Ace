@@ -3,7 +3,7 @@ import ollama
 
 # Page setup
 st.set_page_config(page_title="Talk to Ace – Your CSR Assistant", page_icon="")
-st.title(" Talk to Ace – Your CSR Assistant")
+st.title("Talk to Ace – Your CSR Assistant")
 st.markdown("""
 Welcome to our credit repair service! I'm **Ace**, your friendly Customer Service Representative.
 
