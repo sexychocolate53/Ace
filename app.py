@@ -82,8 +82,6 @@ st.chat_message("assistant").markdown("💬 Hi, I'm Ace! How can I help you toda
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).markdown(msg["content"])
 
-user_input = st.chat_input("Type your question here...")
-
 if user_input:
     st.chat_message("user").markdown(user_input)
     with st.spinner("Ace is typing..."):
